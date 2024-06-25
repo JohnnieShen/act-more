@@ -2,13 +2,14 @@ import time
 import os
 import numpy as np
 import argparse
+from tqdm import tqdm
 import matplotlib.pyplot as plt
 import h5py
 
-from constants import PUPPET_GRIPPER_POSITION_NORMALIZE_FN, SIM_TASK_CONFIGS
-from ee_sim_env import make_ee_sim_env
+from constants import PUPPET_GRIPPER_POSITION_NORMALIZE_FN, SIM_TASK_CONFIGS, FR5_START_ARM_POSE
+from ee_sim_env import make_ee_sim_env,setup_and_print_env
 from sim_env import make_sim_env, BOX_POSE
-from scripted_policy import PickAndTransferPolicy, InsertionPolicy
+from scripted_policy import PickAndTransferPolicy, InsertionPolicy, PickAndPlacePolicy
 
 import IPython
 e = IPython.embed
@@ -27,7 +28,9 @@ def main(args):
     dataset_dir = args['dataset_dir']
     num_episodes = args['num_episodes']
     onscreen_render = args['onscreen_render']
-    inject_noise = False
+    no_generate = args['no_generate']
+    inject_noise = args['inject_noise']
+    debug=args['debug']
     render_cam_name = 'top'
 
     if not os.path.isdir(dataset_dir):
@@ -39,10 +42,18 @@ def main(args):
         policy_cls = PickAndTransferPolicy
     elif task_name == 'sim_insertion_scripted':
         policy_cls = InsertionPolicy
+    elif task_name == 'sim_place_cube_scripted':
+        policy_cls = PickAndPlacePolicy
+    elif task_name == 'sim_fr5_place_cube_scripted':
+        policy_cls = PickAndPlacePolicy
     elif task_name == 'sim_transfer_cube_scripted_mirror':
         policy_cls = PickAndTransferPolicy
     else:
         raise NotImplementedError
+
+    if(debug):
+        setup_and_print_env(task_name)
+        return
 
     success = []
     for episode_idx in range(num_episodes):
@@ -51,20 +62,28 @@ def main(args):
         # setup the environment
         env = make_ee_sim_env(task_name)
         ts = env.reset()
+
+        # physics = env.physics
+        # physics.named.data.qpos[:16] = FR5_START_ARM_POSE
+        
+
         episode = [ts]
         policy = policy_cls(inject_noise)
+        if inject_noise:
+            print("noise injected")
         # setup plotting
         if onscreen_render:
             ax = plt.subplot()
             plt_img = ax.imshow(ts.observation['images'][render_cam_name])
             plt.ion()
-        for step in range(episode_len):
+        for step in tqdm(range(episode_len), desc="Recording episode in EE"):
             action = policy(ts)
             ts = env.step(action)
             episode.append(ts)
             if onscreen_render:
                 plt_img.set_data(ts.observation['images'][render_cam_name])
                 plt.pause(0.002)
+                # time.sleep(1)
         plt.close()
 
         episode_return = np.sum([ts.reward for ts in episode[1:]])
@@ -102,7 +121,7 @@ def main(args):
             ax = plt.subplot()
             plt_img = ax.imshow(ts.observation['images'][render_cam_name])
             plt.ion()
-        for t in range(len(joint_traj)): # note: this will increase episode length by 1
+        for t in tqdm(range(len(joint_traj)), desc="Replaying episode in joint command"): # note: this will increase episode length by 1
             action = joint_traj[t]
             ts = env.step(action)
             episode_replay.append(ts)
@@ -158,26 +177,29 @@ def main(args):
                 data_dict[f'/observations/images/{cam_name}'].append(ts.observation['images'][cam_name])
 
         # HDF5
-        t0 = time.time()
-        dataset_path = os.path.join(dataset_dir, f'episode_{episode_idx}')
-        with h5py.File(dataset_path + '.hdf5', 'w', rdcc_nbytes=1024 ** 2 * 2) as root:
-            root.attrs['sim'] = True
-            obs = root.create_group('observations')
-            image = obs.create_group('images')
-            for cam_name in camera_names:
-                _ = image.create_dataset(cam_name, (max_timesteps, 480, 640, 3), dtype='uint8',
-                                         chunks=(1, 480, 640, 3), )
-            # compression='gzip',compression_opts=2,)
-            # compression=32001, compression_opts=(0, 0, 0, 0, 9, 1, 1), shuffle=False)
-            qpos = obs.create_dataset('qpos', (max_timesteps, 14))
-            qvel = obs.create_dataset('qvel', (max_timesteps, 14))
-            action = root.create_dataset('action', (max_timesteps, 14))
+        if not no_generate:
+            t0 = time.time()
+            dataset_path = os.path.join(dataset_dir, f'episode_{episode_idx}')
+            with h5py.File(dataset_path + '.hdf5', 'w', rdcc_nbytes=1024 ** 2 * 2) as root:
+                root.attrs['sim'] = True
+                obs = root.create_group('observations')
+                image = obs.create_group('images')
+                for cam_name in camera_names:
+                    _ = image.create_dataset(cam_name, (max_timesteps, 480, 640, 3), dtype='uint8',
+                                            chunks=(1, 480, 640, 3), )
+                # compression='gzip',compression_opts=2,)
+                # compression=32001, compression_opts=(0, 0, 0, 0, 9, 1, 1), shuffle=False)
+                qpos = obs.create_dataset('qpos', (max_timesteps, 14))
+                qvel = obs.create_dataset('qvel', (max_timesteps, 14))
+                action = root.create_dataset('action', (max_timesteps, 14))
 
-            for name, array in data_dict.items():
-                root[name][...] = array
-        print(f'Saving: {time.time() - t0:.1f} secs\n')
-
-    print(f'Saved to {dataset_dir}')
+                for name, array in data_dict.items():
+                    root[name][...] = array
+            print(f'Saving: {time.time() - t0:.1f} secs\n')
+    if not no_generate:
+        print(f'Saved to {dataset_dir}')
+    else:
+        print("Chose not to generate dataset")
     print(f'Success: {np.sum(success)} / {len(success)}')
 
 if __name__ == '__main__':
@@ -186,6 +208,9 @@ if __name__ == '__main__':
     parser.add_argument('--dataset_dir', action='store', type=str, help='dataset saving dir', required=True)
     parser.add_argument('--num_episodes', action='store', type=int, help='num_episodes', required=False)
     parser.add_argument('--onscreen_render', action='store_true')
+    parser.add_argument('--inject_noise', action='store_true')
+    parser.add_argument('--no_generate', action='store_true')
+    parser.add_argument('--debug', action='store_true')
     
     main(vars(parser.parse_args()))
 

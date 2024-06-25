@@ -2,10 +2,24 @@ import pathlib
 import os
 
 ### Task parameters
-DATA_DIR = '/home/zfu/interbotix_ws/src/act/data' if os.getlogin() == 'zfu' else '/scr/tonyzhao/datasets'
+DATA_DIR = '/home/jshen52/aloha/act-more/data'
 SIM_TASK_CONFIGS = {
     'sim_transfer_cube_scripted':{
         'dataset_dir': DATA_DIR + '/sim_transfer_cube_scripted',
+        'num_episodes': 50,
+        'episode_len': 400,
+        'camera_names': ['top', 'left_wrist', 'right_wrist']
+    },
+
+    'sim_place_cube_scripted':{
+        'dataset_dir': DATA_DIR + '/sim_place_cube_scripted',
+        'num_episodes': 50,
+        'episode_len': 400,
+        'camera_names': ['top', 'left_wrist', 'right_wrist']
+    },
+
+    'sim_fr5_place_cube_scripted':{
+        'dataset_dir': DATA_DIR + '/sim_fr5_place_cube_scripted',
         'num_episodes': 50,
         'episode_len': 400,
         'camera_names': ['top', 'left_wrist', 'right_wrist']
@@ -22,7 +36,8 @@ SIM_TASK_CONFIGS = {
         'dataset_dir': DATA_DIR + '/sim_insertion_scripted',
         'num_episodes': 50,
         'episode_len': 400,
-        'camera_names': ['top', 'left_wrist', 'right_wrist']
+        # 'camera_names': ['top', 'left_wrist', 'right_wrist']
+        'camera_names': ['top']
     },
 
     'sim_insertion_human': {
@@ -60,6 +75,8 @@ DT = 0.02
 FPS = 50
 JOINT_NAMES = ["waist", "shoulder", "elbow", "forearm_roll", "wrist_angle", "wrist_rotate"]
 START_ARM_POSE = [0, -0.96, 1.16, 0, -0.3, 0, 0.02239, -0.02239,  0, -0.96, 1.16, 0, -0.3, 0, 0.02239, -0.02239]
+FR5_START_ARM_POSE = [-0.02, -1.52, -2.63, 0.9, 1.6, 0, 0.024, -0.024, -0.02, -1.52, -2.63, 0.9, 1.6, 0, 0.024, -0.024]
+FR5_EMPTY_START_ARM_POSE = [0, 0, 0, 0, 0, 0, 0.024, -0.024, 0, 0, 0, 0, 0, 0, 0.024, -0.024]
 
 XML_DIR = str(pathlib.Path(__file__).parent.resolve()) + '/assets/' # note: absolute path
 

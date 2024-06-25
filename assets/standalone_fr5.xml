@@ -1,0 +1,72 @@
+<mujoco>
+  <include file="fr5_dependencies.xml"/>
+  <worldbody>
+    <body name="left_fr5" pos="-0.75 0.5 0">
+      <geom type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="base_link"/>
+      <body name="left_shoulder_Link" pos="0 0 0.08" quat="-0.707107 0.707107 0 0">
+        <inertial pos="1.3785e-06 -0.0031495 0.14526" quat="0.707107 0.707107 0 0" mass="0.6" diaginertia="0.010397 0.0102875 0.00762124"/>
+        <joint name="left_waist_joint" pos="0 0 0" axis="0 1 0" limited="true" range="-3.05433 3.05433" frictionloss="100"/>
+        <geom type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="shoulder_Link"/>
+        <body name="left_upperarm_Link" pos="0 -0.064 0" quat="0 -0.707107 0.707107 0">
+          <inertial pos="-2.2928e-05 0.33278 0.084237" quat="0.5 0.5 -0.5 0.5" mass="0.7" diaginertia="2.9074 2.82381 0.11842"/>
+          <joint name="left_shoulder_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-4.62512 1.48353" frictionloss="120"/>
+          <geom type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="upperarm_Link"/>
+          <body name="left_forearm_Link" pos="0 0.425 0" quat="0.707107 0 0 -0.707107">
+            <inertial pos="0.092224 -2.2928e-05 0.084237" quat="0.486177 0.513488 0.513523 0.486062" mass="0.6" diaginertia="2.9074 2.82381 0.11842"/>
+            <joint name="left_elbow_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-2.82743 2.82743" frictionloss="120"/>
+            <geom type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="forearm_Link"/>
+            <body name="left_wrist1_Link" pos="-0.395 0 0" quat="0.707107 0 0 0.707107">
+              <inertial pos="0.48722 -2.2928e-05 0.084237" quat="0.486177 0.513488 0.513523 0.486062" mass="0.3" diaginertia="2.9074 2.82381 0.11842"/>
+              <joint name="left_forearm_rotate_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-4.62512 1.48353" frictionloss="100"/>
+              <geom type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="wrist1_Link"/>
+              <body name="left_wrist2_Link" pos="0 0 0.13" quat="0.5 0.5 -0.5 -0.5">
+                <inertial pos="-2.396e-06 0.0045906 0.099342" quat="0.697165 0.71691 0.000159402 -0.000238092" mass="0.3" diaginertia="0.0022393 0.00218702 0.00139078"/>
+                <joint name="left_wrist_rotate_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-3.05433 3.05433" frictionloss="50"/>
+                <geom type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="wrist2_Link"/>
+                <body name="left_wrist3_Link" pos="0 0 0.102" quat="0.298836 -0.298836 0.640856 0.640856">
+                  <inertial pos="5.8427e-06 7.5807e-05 0.079126" quat="0.59157 0.386541 -0.592528 0.386707" mass="0.2" diaginertia="0.00041582 0.000278165 0.000277205"/>
+                  <joint name="left_gripper_rotate_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-3.05433 3.05433" frictionloss="50"/>
+                  <geom type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="wrist3_Link"/>
+                  <body name="left_gripper_link" pos="0 0 0.07" quat="0 0.707107 0 0.707107">
+                    <body name="left_camera_focus" pos="0.15 0 0.01">
+                        <site pos="0 0 0" size="0.01" type="sphere" name="left_cam_focus" rgba="0 0 1 0"/>
+                    </body>
+                    <site pos="0.15 0 0" size="0.003 0.003 0.03" type="box" name="cali_left_site1" rgba="0 0 1 0"/>
+                    <site pos="0.15 0 0" size="0.003 0.03 0.003" type="box" name="cali_left_site2" rgba="0 0 1 0"/>
+                    <site pos="0.15 0 0" size="0.03 0.003 0.003" type="box" name="cali_left_site3" rgba="0 0 1 0"/>
+                    <camera name="left_wrist" pos="-0.1 0 0.16" fovy="20" mode="fixed" euler="0 -1.05 -1.5707" />
+                    <inertial pos="0.0395662 -2.56311e-07 0.00400649" quat="0.62033 0.619916 -0.339682 0.339869" mass="0.251652" diaginertia="0.000689546 0.000650316 0.000468142" />
+                    <geom pos="-0.02 0 0" quat="0.707107 0 0 0.707107" type="mesh" mesh="vx300s_7_gripper" name="left_7_gripper"/>
+                    <geom pos="-0.020175 0 0" quat="0.707107 0 0 0.707107" type="mesh" mesh="vx300s_9_gripper_bar" name="left_9_gripper_bar"/>
+                    <body name="left_gripper_prop_link" pos="0.0485 0 0">
+                        <inertial pos="0.002378 2.85e-08 0" quat="0 0 0.897698 0.440611" mass="0.008009" diaginertia="4.2979e-06 2.8868e-06 1.5314e-06" />
+                        <geom pos="-0.0685 0 0" quat="0.707107 0 0 0.707107" type="mesh" mesh="vx300s_8_gripper_prop" name="left_8_gripper_prop" />
+                    </body>
+                    <body name="left_left_finger_link" pos="0.0687 0 0">
+                        <inertial pos="0.017344 -0.0060692 0" quat="0.449364 0.449364 -0.54596 -0.54596" mass="0.034796" diaginertia="2.48003e-05 1.417e-05 1.20797e-05" />
+                        <joint name="left_left_finger" pos="0 0 0" axis="0 1 0" type="slide" limited="true" range="0.021 0.057" frictionloss="30" />
+                        <geom condim="4" solimp="2 1 0.01" solref="0.01 1" friction="1 0.005 0.0001" pos="0.005 -0.052 0" euler="3.14 1.57 0" type="mesh" mesh="vx300s_10_gripper_finger_left" name="left_10_left_gripper_finger"/>
+                    </body>
+                    <body name="left_right_finger_link" pos="0.0687 0 0">
+                        <inertial pos="0.017344 0.0060692 0" quat="0.44937 -0.44937 0.545955 -0.545955" mass="0.034796" diaginertia="2.48002e-05 1.417e-05 1.20798e-05" />
+                        <joint name="left_right_finger" pos="0 0 0" axis="0 1 0" type="slide" limited="true" range="-0.057 -0.021" frictionloss="30" />
+                        <geom condim="4" solimp="2 1 0.01" solref="0.01 1" friction="1 0.005 0.0001" pos="0.005 0.052 0" euler="3.14 1.57 0" type="mesh" mesh="vx300s_10_gripper_finger_right" name="left_10_right_gripper_finger"/>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <actuator>
+    <position ctrllimited="true" ctrlrange="-3.05433 3.05433" joint="left_waist_joint" kp="1500" user="1" forcelimited="true" forcerange="-150 150"/>
+    <position ctrllimited="true" ctrlrange="-4.62512 1.48353" joint="left_shoulder_joint" kp="4000" user="1" forcelimited="true" forcerange="-150 150"/>
+    <position ctrllimited="true" ctrlrange="-2.82743 2.82743" joint="left_elbow_joint" kp="2000" user="1" forcelimited="true" forcerange="-150 150"/>
+    <position ctrllimited="true" ctrlrange="-4.62512 1.48353" joint="left_forearm_rotate_joint" kp="3000" user="1" forcelimited="true" forcerange="-150 150"/>
+    <position ctrllimited="true" ctrlrange="-3.14158 3.14158" joint="left_wrist_rotate_joint" kp="500" user="1" forcelimited="true" forcerange="-28 28"/>
+    <position ctrllimited="true" ctrlrange="-3.14158 3.14158" joint="left_gripper_rotate_joint" kp="200" user="1" forcelimited="true" forcerange="-28 28"/>
+  </actuator>
+</mujoco>

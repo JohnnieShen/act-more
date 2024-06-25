@@ -312,6 +312,16 @@ def sample_box_pose():
     cube_quat = np.array([1, 0, 0, 0])
     return np.concatenate([cube_position, cube_quat])
 
+def sample_place_box_pose():
+    x_range = [-0.28, 0.08]
+    y_range = [0.22, 0.98]
+    z_range = [0.04, 0.04]
+    ranges = np.vstack([x_range, y_range, z_range])
+    cube_position = np.random.uniform(ranges[:, 0], ranges[:, 1])
+
+    cube_quat = np.array([1, 0, 0, 0])
+    return np.concatenate([cube_position, cube_quat])
+
 def sample_insertion_pose():
     # Peg
     x_range = [0.1, 0.2]

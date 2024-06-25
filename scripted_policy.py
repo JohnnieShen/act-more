@@ -103,6 +103,54 @@ class PickAndTransferPolicy(BasePolicy):
             {"t": 400, "xyz": meet_xyz + np.array([0.1, 0, 0]), "quat": gripper_pick_quat.elements, "gripper": 1}, # stay
         ]
 
+class PickAndPlacePolicy(BasePolicy):
+
+    def generate_trajectory(self, ts_first):
+        init_mocap_pose_right = ts_first.observation['mocap_pose_right']
+        init_mocap_pose_left = ts_first.observation['mocap_pose_left']
+
+        box_info = np.array(ts_first.observation['env_state'])
+        box_xyz = box_info[:3]
+        box_quat = box_info[3:]
+        print(f"Box XYZ: {box_xyz=}")
+        place_xyz = np.array([0.2, 0.5, 0.05])
+
+        gripper_pick_quat = Quaternion(init_mocap_pose_right[3:])
+        gripper_pick_quat = gripper_pick_quat * Quaternion(axis=[0.0, 1.0, 0.0], degrees=-60)
+
+
+        self.left_trajectory = [
+            {"t": 0, "xyz": init_mocap_pose_left[:3], "quat": init_mocap_pose_left[3:], "gripper": 0}, # initial position
+            {"t": 400, "xyz": init_mocap_pose_left[:3], "quat": init_mocap_pose_left[3:], "gripper": 0}, # hold position
+
+            # {"t": 0, "xyz": init_mocap_pose_left[:3], "quat": init_mocap_pose_left[3:], "gripper": 0},  # initial position
+            # {"t": 90, "xyz": box_xyz + np.array([0, 0, 0.08]), "quat": gripper_pick_quat.elements, "gripper": 1},  # approach the box
+            # {"t": 120, "xyz": box_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 1},  # go down
+            # {"t": 150, "xyz": box_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 0},  # close gripper
+            # {"t": 180, "xyz": box_xyz + np.array([0, 0, 0.1]), "quat": gripper_pick_quat.elements, "gripper": 0},
+            # {"t": 230, "xyz": place_xyz + np.array([0, 0, 0.1]), "quat": gripper_pick_quat.elements, "gripper": 0},  # move to place position
+            # {"t": 270, "xyz": place_xyz + np.array([0, 0, -0.01]), "quat": gripper_pick_quat.elements, "gripper": 0},  # lower arm slightly above the table
+            # {"t": 310, "xyz": place_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 0},  # gently place on the table
+            # {"t": 340, "xyz": place_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 1},  # open gripper
+            # {"t": 370, "xyz": place_xyz + np.array([0, 0, 0.01]), "quat": gripper_pick_quat.elements, "gripper": 1},  # move away from the box
+            # {"t": 400, "xyz": place_xyz + np.array([0, 0, 0.1]), "quat": gripper_pick_quat.elements, "gripper": 1},  # hold position
+        ]
+
+        self.right_trajectory = [
+            {"t": 0, "xyz": init_mocap_pose_right[:3], "quat": init_mocap_pose_right[3:], "gripper": 0},  # initial position
+            {"t": 90, "xyz": box_xyz + np.array([0, 0, 0.5]), "quat": gripper_pick_quat.elements, "gripper": 1},  # approach the box
+            {"t": 120, "xyz": box_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 1},  # go down
+            {"t": 150, "xyz": box_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 0},  # close gripper
+            {"t": 180, "xyz": box_xyz + np.array([0, 0, 0.4]), "quat": gripper_pick_quat.elements, "gripper": 0},
+            {"t": 230, "xyz": place_xyz + np.array([0, 0, 0.4]), "quat": gripper_pick_quat.elements, "gripper": 0},  # move to place position
+            {"t": 270, "xyz": place_xyz + np.array([0, 0, -0.01]), "quat": gripper_pick_quat.elements, "gripper": 0},  # lower arm slightly above the table
+            {"t": 310, "xyz": place_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 0},  # gently place on the table
+            {"t": 340, "xyz": place_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 1},  # open gripper
+            {"t": 370, "xyz": place_xyz + np.array([0, 0, 0.01]), "quat": gripper_pick_quat.elements, "gripper": 1},  # move away from the box
+            {"t": 400, "xyz": place_xyz + np.array([0, 0, 0.4]), "quat": gripper_pick_quat.elements, "gripper": 1},  # hold position
+            # {"t": 400, "xyz": init_mocap_pose_right[:3], "quat": init_mocap_pose_right[3:], "gripper": 0},
+        ]
+
 
 class InsertionPolicy(BasePolicy):
 

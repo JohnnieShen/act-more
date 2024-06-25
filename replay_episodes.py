@@ -3,10 +3,11 @@ import h5py
 import argparse
 from collections import defaultdict 
 from sim_env import make_sim_env
-from utils import sample_box_pose, sample_insertion_pose
+from utils import sample_box_pose, sample_insertion_pose, sample_place_box_pose
 from sim_env import BOX_POSE
 from constants import DT
 from visualize_episodes import save_videos
+from tqdm import tqdm
 
 import IPython
 e = IPython.embed
@@ -14,7 +15,7 @@ e = IPython.embed
 
 def main(args):
     dataset_path = args['dataset_path']
-
+    task_name = args['task_name']
 
     if not os.path.isfile(dataset_path):
         print(f'Dataset does not exist at \n{dataset_path}\n')
@@ -23,11 +24,11 @@ def main(args):
     with h5py.File(dataset_path, 'r') as root:
         actions = root['/action'][()]
 
-    env = make_sim_env('sim_transfer_cube')
-    BOX_POSE[0] = sample_box_pose() # used in sim reset
+    env = make_sim_env(task_name)
+    BOX_POSE[0] = sample_place_box_pose()  # used in sim reset
     ts = env.reset()
     episode_replay = [ts]
-    for action in actions:
+    for action in tqdm(actions, desc="Replaying episode"):
         ts = env.step(action)
         episode_replay.append(ts)
 
@@ -44,5 +45,6 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--task_name', action='store', type=str, help='task name.', required=True)
     parser.add_argument('--dataset_path', action='store', type=str, help='Dataset path.', required=True)
     main(vars(parser.parse_args()))
