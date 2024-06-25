@@ -70,9 +70,18 @@ To set up a new terminal, run:
 We use ``sim_transfer_cube_scripted`` task in the examples below. Another option is ``sim_insertion_scripted``.
 To generated 50 episodes of scripted data, run:
 
-    python3 record_sim_episodes.py --task_name sim_transfer_cube_scripted --dataset_dir <data save dir> --num_episodes 50
+    python3 record_sim_episodes.py --task_name sim_fr5_place_cube_scripted --dataset_dir <data save dir> --num_episodes 50
 
 To can add the flag ``--onscreen_render`` to see real-time rendering.
+
+Before running the below command, change the ip address of the robot in ``async_fairino_record_episode.py`` to your respective address.
+To start hybrid teleops, run:
+
+    python3 async_fairino_record_episode.py --task_name sim_fr5_place_cube_scripted --dataset_name test --radian
+
+To switch to reading degree data instead, add the flag ``--degree`` instead.
+After running this command, you will need to press space to start recording an episode, afterwards, in order to rotate and close / open the gripper, press ``a``, ``d`` and ``space``.
+
 To visualize the simulated episodes after it is collected, run
 
     python3 visualize_episodes.py --dataset_dir <data save dir> --episode_idx 0
@@ -86,6 +95,7 @@ To train ACT:
 
 
 To evaluate the policy, run the same command but add ``--eval``. This loads the best validation checkpoint.
+To run the policy in simulation or in real life, add ``run``.
 The success rate should be around 90% for transfer cube, and around 50% for insertion.
 To enable temporal ensembling, add flag ``--temporal_agg``.
 Videos will be saved to ``<ckpt_dir>`` for each rollout.
