@@ -1,5 +1,18 @@
 # Imitation Learning algorithms and Co-training for Mobile ALOHA
 
+### This repo is forked from [act-plus-plus](https://github.com/MarkFzp/act-plus-plus)
+This repo builds upon the foundation of act-plus-plus but adopts the fairino FR series (more specifically the FR5) robot arm instead.
+
+More features include: 
+```
+Hybrid teleops (real master and virtual puppet)
+
+Run model checkpoint from `imitate_episodes.py`
+
+More tasks (sim_place_cube)
+
+QOL changes etc.
+```
 
 #### Project Website: https://mobile-aloha.github.io/
 
