@@ -138,16 +138,16 @@ class PickAndPlacePolicy(BasePolicy):
 
         self.right_trajectory = [
             {"t": 0, "xyz": init_mocap_pose_right[:3], "quat": init_mocap_pose_right[3:], "gripper": 0},  # initial position
-            {"t": 90, "xyz": box_xyz + np.array([0, 0, 0.5]), "quat": gripper_pick_quat.elements, "gripper": 1},  # approach the box
-            {"t": 120, "xyz": box_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 1},  # go down
-            {"t": 150, "xyz": box_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 0},  # close gripper
-            {"t": 180, "xyz": box_xyz + np.array([0, 0, 0.4]), "quat": gripper_pick_quat.elements, "gripper": 0},
-            {"t": 230, "xyz": place_xyz + np.array([0, 0, 0.4]), "quat": gripper_pick_quat.elements, "gripper": 0},  # move to place position
-            {"t": 270, "xyz": place_xyz + np.array([0, 0, -0.01]), "quat": gripper_pick_quat.elements, "gripper": 0},  # lower arm slightly above the table
-            {"t": 310, "xyz": place_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 0},  # gently place on the table
-            {"t": 340, "xyz": place_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 1},  # open gripper
-            {"t": 370, "xyz": place_xyz + np.array([0, 0, 0.01]), "quat": gripper_pick_quat.elements, "gripper": 1},  # move away from the box
-            {"t": 400, "xyz": place_xyz + np.array([0, 0, 0.4]), "quat": gripper_pick_quat.elements, "gripper": 1},  # hold position
+            {"t": 100, "xyz": box_xyz + np.array([0, 0, 0.5]), "quat": gripper_pick_quat.elements, "gripper": 1},  # approach the box
+            {"t": 160, "xyz": box_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 1},  # go down
+            {"t": 170, "xyz": box_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 0},  # close gripper
+            {"t": 220, "xyz": box_xyz + np.array([0, 0, 0.4]), "quat": gripper_pick_quat.elements, "gripper": 0},
+            {"t": 280, "xyz": place_xyz + np.array([0, 0, 0.4]), "quat": gripper_pick_quat.elements, "gripper": 0},  # move to place position
+            {"t": 320, "xyz": place_xyz + np.array([0, 0, -0.01]), "quat": gripper_pick_quat.elements, "gripper": 0},  # lower arm slightly above the table
+            {"t": 350, "xyz": place_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 0},  # gently place on the table
+            {"t": 360, "xyz": place_xyz + np.array([0, 0, -0.03]), "quat": gripper_pick_quat.elements, "gripper": 1},  # open gripper
+            {"t": 380, "xyz": place_xyz + np.array([0, 0, 0.01]), "quat": gripper_pick_quat.elements, "gripper": 1},  # move away from the box
+            {"t": 400, "xyz": place_xyz + np.array([0, 0, 0.2]), "quat": gripper_pick_quat.elements, "gripper": 1},  # hold position
             # {"t": 400, "xyz": init_mocap_pose_right[:3], "quat": init_mocap_pose_right[3:], "gripper": 0},
         ]
 

@@ -75,7 +75,7 @@ def make_ee_sim_env(task_name):
     if 'sim_fr5_place_cube' in task_name:
         xml_path = os.path.join(XML_DIR, f'bimanual_fr5_ee_place_cube.xml')
         physics = mujoco.Physics.from_xml_path(xml_path)
-        task = PickAndPlaceEETask(random=False)
+        task = FR5PickAndPlaceEETask(random=False)
         env = control.Environment(physics, task, time_limit=20, control_timestep=DT,
                                   n_sub_steps=None, flat_observation=False)
     elif 'sim_transfer_cube' in task_name:
@@ -402,18 +402,102 @@ class PickAndPlaceEETask(BimanualViperXEETask):
             # print(f"4 {np.linalg.norm(box_xyz - self.place_xyz)}")
             reward = 4  # Box is placed correctly and not held by the gripper
         
-        if touch_side:
-            print("gripper touched side")
-            reward -= 2
-        if box_touched_side:
-            print("box touched side")
-            reward -= 2
+        # if touch_side:
+        #     print("gripper touched side")
+        #     reward -= 2
+        # if box_touched_side:
+        #     print("box touched side")
+        #     reward -= 2
 
         # current_qvel = physics.data.qvel
         # velocity_change = np.linalg.norm(current_qvel - self.previous_qvel)
         # if velocity_change > 0.08:
-            penalty = -0.1 * velocity_change
+        #     penalty = -0.1 * velocity_change
             # reward += penalty
+        # print(f"velocity change: {velocity_change}")
+
+        # self.previous_qvel = current_qvel.copy()
+
+        return reward
+
+
+class FR5PickAndPlaceEETask(BimanualViperXEETask):
+    def __init__(self, random=None):
+        super().__init__(random=random)
+        self.max_reward = 4
+        self.previous_qvel = None
+
+    def initialize_episode(self, physics):
+        self.initialize_robots(physics)
+        box_pose = sample_place_box_pose()
+        box_start_idx = physics.model.name2id('red_box_joint', 'joint')
+        np.copyto(physics.data.qpos[box_start_idx: box_start_idx + 7], box_pose)
+        self.place_xyz = np.array([0.2, 0.5, 0.02])
+        super().initialize_episode(physics)
+        self.previous_qvel = np.zeros_like(physics.data.qvel)
+
+    @staticmethod
+    def get_env_state(physics):
+        env_state = physics.data.qpos.copy()[16:]
+        return env_state
+
+    def get_reward(self, physics):
+
+        all_contact_pairs = []
+        for i_contact in range(physics.data.ncon):
+            id_geom_1 = physics.data.contact[i_contact].geom1
+            id_geom_2 = physics.data.contact[i_contact].geom2
+            name_geom_1 = physics.model.id2name(id_geom_1, 'geom')
+            name_geom_2 = physics.model.id2name(id_geom_2, 'geom')
+            contact_pair = (name_geom_1, name_geom_2)
+            all_contact_pairs.append(contact_pair)
+
+        touch_right_gripper = ("red_box", "right_10_right_gripper_finger") in all_contact_pairs
+        touch_table = ("red_box", "table") in all_contact_pairs
+        touch_side_left = ("bin_left_wall", "right_10_right_gripper_finger") in all_contact_pairs or \
+                          ("bin_left_wall", "right_10_left_gripper_finger") in all_contact_pairs
+        touch_side_right = ("bin_right_wall", "right_10_right_gripper_finger") in all_contact_pairs or \
+                           ("bin_right_wall", "right_10_left_gripper_finger") in all_contact_pairs
+        touch_side_front = ("bin_front_wall", "right_10_right_gripper_finger") in all_contact_pairs or \
+                           ("bin_front_wall", "right_10_left_gripper_finger") in all_contact_pairs
+        touch_side_back = ("bin_back_wall", "right_10_right_gripper_finger") in all_contact_pairs or \
+                          ("bin_back_wall", "right_10_left_gripper_finger") in all_contact_pairs
+        touch_side = touch_side_left or touch_side_right or touch_side_front or touch_side_back
+
+        box_touched_side = ("bin_left_wall", "red_box") in all_contact_pairs or (
+        "bin_right_wall", "red_box") in all_contact_pairs or \
+                           ("bin_front_wall", "red_box") in all_contact_pairs or (
+                           "bin_back_wall", "red_box") in all_contact_pairs
+
+        box_xyz = physics.named.data.geom_xpos['red_box'][:3]
+        placed_correctly = np.linalg.norm(box_xyz - self.place_xyz) < 0.02
+
+        reward = 0
+        if touch_right_gripper:
+            # print("1")
+            reward = 1  # Grasped the box with the right gripper
+        if touch_right_gripper and (not touch_table):
+            # print(f"2 {np.linalg.norm(box_xyz - self.place_xyz)}")
+            reward = 2  # Lifted the box with the right gripper
+        if touch_right_gripper and placed_correctly:
+            # print(f"3 {np.linalg.norm(box_xyz - self.place_xyz)}")
+            reward = 3  # Box is held by the right gripper and placed correctly
+        if placed_correctly and (not touch_right_gripper):
+            # print(f"4 {np.linalg.norm(box_xyz - self.place_xyz)}")
+            reward = 4  # Box is placed correctly and not held by the gripper
+
+        # if touch_side:
+        #     print("gripper touched side")
+        #     reward -= 2
+        # if box_touched_side:
+        #     print("box touched side")
+        #     reward -= 2
+
+        # current_qvel = physics.data.qvel
+        # velocity_change = np.linalg.norm(current_qvel - self.previous_qvel)
+        # if velocity_change > 0.08:
+        #     penalty = -0.1 * velocity_change
+        # reward += penalty
         # print(f"velocity change: {velocity_change}")
 
         # self.previous_qvel = current_qvel.copy()

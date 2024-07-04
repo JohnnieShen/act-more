@@ -80,6 +80,7 @@ def main(args):
             action = policy(ts)
             ts = env.step(action)
             episode.append(ts)
+            print(ts.observation['qpos'])
             if onscreen_render:
                 plt_img.set_data(ts.observation['images'][render_cam_name])
                 plt.pause(0.002)
