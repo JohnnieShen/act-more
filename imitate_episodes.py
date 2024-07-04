@@ -504,7 +504,7 @@ def eval_bc(config, ckpt_name, is_run=False, save_episode=True, num_rollouts=50)
         ### set task
         if 'sim_transfer_cube' in task_name:
             BOX_POSE[0] = sample_box_pose() # used in sim reset
-        elif 'sim_place_cube' in task_name:
+        elif 'sim_place_cube' in task_name or 'sim_fr5_place_cube' in task_name:
             BOX_POSE[0] = sample_place_box_pose() # used in sim reset
         elif 'sim_insertion' in task_name:
             BOX_POSE[0] = np.concatenate(sample_insertion_pose()) # used in sim reset
