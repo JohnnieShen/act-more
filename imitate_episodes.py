@@ -11,6 +11,9 @@ from einops import rearrange
 import wandb
 import time
 from torchvision import transforms
+from InverseKinematics_fr5 import InverseKinematics
+from NFCWebots.FR5RobotArmLimitDict import FR5RobotArmLimitDict
+from NFCWebots.logging_main import logging_main
 
 from constants import FPS
 from constants import PUPPET_GRIPPER_JOINT_OPEN
@@ -20,7 +23,7 @@ from utils import compute_dict_mean, set_seed, detach_dict, calibrate_linear_vel
 from policy import ACTPolicy, CNNMLPPolicy, DiffusionPolicy
 from visualize_episodes import save_videos
 
-from fairino_utils import unnormalize_angles
+from fairino_utils import unnormalize_angles, normalize_angles
 
 from detr.models.latent_model import Latent_Model_Transformer
 
@@ -238,6 +241,19 @@ def run_policy(config, ckpt_name):
 
     robot = Robot.RPC('192.168.31.202')
 
+    logging_main.setup_logging(default_path="config/inner_logging.json")
+    modol_name = "Fr5Robot"
+    unit_type = "mm_du"
+    inv = InverseKinematics(modol_name)
+
+    baseXOffset = 0.0
+    baseYOffset = 0.0
+    baseZOffset = 0.0
+
+    endXOffset = 0.0
+    endYOffset = 0.0
+    endZOffset = 0.0
+
     set_seed(1000)
     ckpt_dir = config['ckpt_dir']
     state_dim = config['state_dim']
@@ -380,9 +396,27 @@ def run_policy(config, ckpt_name):
                 ret = robot.GetForwardKin(left_qpos)
                 print("forward kinematics left: ", ret)
                 ret = robot.GetForwardKin(right_qpos)
+                inputFR5LastBase = ret
                 print("forward kinematics right: ", ret)
                 t1=time.time()
                 print("time spent calculating FK: ", t1-t0)
+                inputXYZAndRxRyRz = inputFR5LastBase
+                inverseKinematics = InverseKinematics.robot_arm_inverse_base_end_position_calculator(inv.logger, unit_type,
+                                                                                         inputXYZAndRxRyRz,
+                                                                                         baseXOffset, baseYOffset,
+                                                                                         baseZOffset,
+                                                                                         endXOffset, endYOffset,
+                                                                                         endZOffset)
+                if not inverseKinematics:
+                    print("inverse kinematics failed to find a solution")
+                    exit()
+                else:
+                    ret = robot.GetActualJointPosRadian()
+                    ret = normalize_angles(ret)
+                    optimalSolution = InverseKinematics.minimumRotationAngle(inv.logger, inverseKinematics, ret)
+                    print(optimalSolution)
+                t2=time.time()
+                print("time spent calculating IK: ", t2-t1)
                 ts = env.step(target_qpos)
             print(f"Step {t}: Target qpos = {target_qpos}")
 
