@@ -5,9 +5,9 @@ import sys
 
 sys.path.append('/home/wedo/opt/fr5eg')
 
-import logging
+# import logging
 
-from NFCWebots.kinematics.logging_main import logging_main
+# from NFCWebots.logging_main import logging_main
 
 
 class FR5RobotArmLimitDict:
@@ -28,7 +28,7 @@ class FR5RobotArmLimitDict:
 
     def __init__(self, positiveNumber, negativeNumber):
         # 获取已经配置好的logger   获取logger实例
-        self.logger = logging.getLogger("main_log.fr5robotarmlimit.py")
+        # self.logger = logging.getLogger("main_log.fr5robotarmlimit.py")
 
         self.positiveNumber = positiveNumber
         self.negativeNumber = negativeNumber
@@ -180,11 +180,11 @@ class FR5RobotArmLimitDict:
 
 if __name__ == '__main__':
     # 假设你的JSON配置文件路径为'logging_config.json'
-    logging_main.setup_logging(default_path="../kinematics/config/inner_logging.json")
+    # logging_main.setup_logging(default_path="../kinematics/config/inner_logging.json")
 
     fr5 = FR5RobotArmLimitDict(30, 40)
     print(f"输出对应的信息为:{FR5RobotArmLimitDict.checkJoint6Range(30)}")
-    fr5.logger.info(f"输出对应的信息为:{FR5RobotArmLimitDict.checkJoint6Range(30)}")
+    # fr5.logger.info(f"输出对应的信息为:{FR5RobotArmLimitDict.checkJoint6Range(30)}")
 
     a = None
     print(a is None)

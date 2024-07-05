@@ -13,7 +13,7 @@ import time
 from torchvision import transforms
 from InverseKinematics_fr5 import InverseKinematics
 from NFCWebots.FR5RobotArmLimitDict import FR5RobotArmLimitDict
-from NFCWebots.logging_main import logging_main
+# from NFCWebots.logging_main import logging_main
 
 from constants import FPS
 from constants import PUPPET_GRIPPER_JOINT_OPEN
@@ -241,7 +241,7 @@ def run_policy(config, ckpt_name):
 
     robot = Robot.RPC('192.168.31.202')
 
-    logging_main.setup_logging(default_path="config/inner_logging.json")
+    # logging_main.setup_logging(default_path="config/inner_logging.json")
     modol_name = "Fr5Robot"
     unit_type = "mm_du"
     inv = InverseKinematics(modol_name)
@@ -393,15 +393,15 @@ def run_policy(config, ckpt_name):
                 ts = env.step(target_qpos, base_action)
             else:
                 t0=time.time()
-                ret = robot.GetForwardKin(left_qpos)
-                print("forward kinematics left: ", ret)
+                # ret = robot.GetForwardKin(left_qpos)
+                # print("forward kinematics left: ", ret)
                 ret = robot.GetForwardKin(right_qpos)
-                inputFR5LastBase = ret
+                inputFR5LastBase = ret[1]
                 print("forward kinematics right: ", ret)
                 t1=time.time()
                 print("time spent calculating FK: ", t1-t0)
                 inputXYZAndRxRyRz = inputFR5LastBase
-                inverseKinematics = InverseKinematics.robot_arm_inverse_base_end_position_calculator(inv.logger, unit_type,
+                inverseKinematics = InverseKinematics.robot_arm_inverse_base_end_position_calculator(None, unit_type,
                                                                                          inputXYZAndRxRyRz,
                                                                                          baseXOffset, baseYOffset,
                                                                                          baseZOffset,
@@ -413,7 +413,7 @@ def run_policy(config, ckpt_name):
                 else:
                     ret = robot.GetActualJointPosRadian()
                     ret = normalize_angles(ret)
-                    optimalSolution = InverseKinematics.minimumRotationAngle(inv.logger, inverseKinematics, ret)
+                    optimalSolution = InverseKinematics.minimumRotationAngle(None, inverseKinematics, ret)
                     print(optimalSolution)
                 t2=time.time()
                 print("time spent calculating IK: ", t2-t1)

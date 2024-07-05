@@ -11,7 +11,7 @@ sys.path.append('/home/wedo/opt/fr5eg')
 import json
 import logging.config
 import os
-import NFCWebots.kinematics.constants as const
+# import NFCWebots.constants as const
 
 
 class logging_main:

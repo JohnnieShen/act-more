@@ -2,14 +2,14 @@
 逆向运动学算法,通过
 """
 
-import logging
+# import logging
 import math
 import numpy as np
 
 from typing import List
 # from NFCWebots.kinematics.ForwardKinematics import ForwardKinematics
 from NFCWebots.FR5RobotArmLimitDict import FR5RobotArmLimitDict
-from NFCWebots.logging_main import logging_main
+# from NFCWebots.logging_main import logging_main
 
 
 class InverseKinematics:
@@ -29,7 +29,7 @@ class InverseKinematics:
         :param d6_offset:  对于在机械臂末端执行器处添加执行器时的垂直高度确认,单位是m,默认是0m
         '''
         # 获取已经配置好的logger   获取logger实例
-        self.logger = logging.getLogger("main_log.InverseKinematics.py")
+        # self.logger = logging.getLogger("main_log.InverseKinematics.py")
 
         global d, a, alpha
         d = InverseKinematics.d_FR5
@@ -37,10 +37,10 @@ class InverseKinematics:
         alpha = InverseKinematics.alpha_FR5
         d[5] = d[5] + d6_offset
 
-        self.logger.info(f"InverseKinematics模型类型为: {model_type}")
-        self.logger.info(f"InverseKinematics DH参数-d为: {d}")
-        self.logger.info(f"InverseKinematics DH参数-a为: {a}")
-        self.logger.info(f"InverseKinematics DH参数-alpha为: {alpha}")
+        # self.logger.info(f"InverseKinematics模型类型为: {model_type}")
+        # self.logger.info(f"InverseKinematics DH参数-d为: {d}")
+        # self.logger.info(f"InverseKinematics DH参数-a为: {a}")
+        # self.logger.info(f"InverseKinematics DH参数-alpha为: {alpha}")
 
     @staticmethod
     def calculate_transformation_matrix(px, py, pz, rx, ry, rz):
@@ -235,7 +235,7 @@ class InverseKinematics:
         # print()
         # print("=========================================")
         for i in range(8):
-            logger.info(f"[第{i + 1}组逆向运动学解] --> 即六自由度机械臂每个关节转动的角度: [单位: °]")
+            # logger.info(f"[第{i + 1}组逆向运动学解] --> 即六自由度机械臂每个关节转动的角度: [单位: °]")
 
             doubles = []
             for j in range(6):
@@ -246,18 +246,18 @@ class InverseKinematics:
                 # print(f"{round(theta_degrees, 4)}°", end=', ')
                 # print(f"theta{j + 1}={round(theta_rad,2)} rad", end=', ')
                 doubles.append(theta_degrees)
-            logger.info(doubles)
+            # logger.info(doubles)
             # 使用 any 函数和 isnan 函数检查是否有 NaN 元素
             if any(np.isnan(d) for d in doubles):
-                print()
-                logger.info(">>>>>>>>>>>>    逆向解中存在NaN值,无法进行正向解验证    <<<<<<<<<<<<")
-                logger.info("====================================================")
-                print()
+                # print()
+                # logger.info(">>>>>>>>>>>>    逆向解中存在NaN值,无法进行正向解验证    <<<<<<<<<<<<")
+                # logger.info("====================================================")
+                # print()
                 continue
             else:
                 resultArrays.append(doubles)
 
-            print()
+            # print()
             # logger.info("对逆向解进行正向学验证:入参单位为°")
             # # 这里添加正向运动学的验证逻辑
             # logger.info("====================================================")
@@ -270,7 +270,7 @@ class InverseKinematics:
             #                                                                                          endZOffset)
             # ForwardKinematics.forward_kinematics_output(transformation_matrix)
             # ForwardKinematics.calculate_forward_kinematics_ref_rpy(transformation_matrix)
-            print()
+            # print()
 
         return resultArrays
 
@@ -291,7 +291,7 @@ class InverseKinematics:
         :param unit_type:
         :return:
         '''
-        logger.info(f"robotArmInversePositionCalculator 当前参与逆运算的入参为:{inputXYZAndRxRyRz},单位为:{unit_type}")
+        # logger.info(f"robotArmInversePositionCalculator 当前参与逆运算的入参为:{inputXYZAndRxRyRz},单位为:{unit_type}")
         # 基坐标的偏移量调整
         inputXYZAndRxRyRz[0] -= baseXOffset
         inputXYZAndRxRyRz[1] -= baseYOffset
@@ -302,10 +302,10 @@ class InverseKinematics:
         inputXYZAndRxRyRz[1] -= endYOffset
         inputXYZAndRxRyRz[2] -= endZOffset
 
-        logger.info(
-            f"进行基坐标base的变换之后与末端法兰执行偏移量变换之后，当前参与逆运算的入参为:{inputXYZAndRxRyRz},单位为:{unit_type}")
+        # logger.info(
+        #     f"进行基坐标base的变换之后与末端法兰执行偏移量变换之后，当前参与逆运算的入参为:{inputXYZAndRxRyRz},单位为:{unit_type}")
 
-        return InverseKinematics.inverseCalculate(logger, unit_type, inputXYZAndRxRyRz, baseXOffset, baseYOffset,
+        return InverseKinematics.inverseCalculate(None, unit_type, inputXYZAndRxRyRz, baseXOffset, baseYOffset,
                                                   baseZOffset, endXOffset, endYOffset, endZOffset)
 
     @staticmethod
@@ -315,21 +315,21 @@ class InverseKinematics:
         :param inverse_kinematics:
         :return:
         """
-        print()
-        logger.info(
-            "………………………………………………………………………限位原则: 排除超出关节角度限制范围的解。每个关节都有其角度范围,超出这个范围的解可能不符合机器人的运动能力。………………………………………………………………………………………………………")
+        # print()
+        # logger.info(
+        #     "………………………………………………………………………限位原则: 排除超出关节角度限制范围的解。每个关节都有其角度范围,超出这个范围的解可能不符合机器人的运动能力。………………………………………………………………………………………………………")
         filtered_list = []
         count = 1
-        logger.info("逆向运动学,工具位姿求解关节位置,根据FR的每个关节运动范围,进行计算符合的输出结果:")
+        # logger.info("逆向运动学,工具位姿求解关节位置,根据FR的每个关节运动范围,进行计算符合的输出结果:")
         for doubles_value in inverse_kinematics:
             is_available = FR5RobotArmLimitDict.checkAngleIsAvailableCommon(logger, doubles_value, initPose)
-            logger.info(f"第{count}组解:{'符合   ' if is_available else '不符合   '} :{doubles_value}")
+            # logger.info(f"第{count}组解:{'符合   ' if is_available else '不符合   '} :{doubles_value}")
             # end=""参数在logger.info中是不必要的,因为logger.info不会像在print函数中那样在字符串末尾添加换行符。logger.info会自动为每次记录添加换行符（除非在日志配置中特别指定了不同的格式）。
             # print(f"第{count}组解:{'符合   ' if is_available else '不符合   '}", end="")
             if is_available:
                 filtered_list.append(doubles_value)
             count += 1
-            print()
+            # print()
 
         # print()
         # count = 1
@@ -408,7 +408,7 @@ class InverseKinematics:
 
 if __name__ == "__main__":
     # 假设你的JSON配置文件路径为'logging_config.json'
-    logging_main.setup_logging(default_path="config/inner_logging.json")
+    # logging_main.setup_logging(default_path="config/inner_logging.json")
 
     """
         根据如入参类型,确定启用哪个类型的机械臂对应的DH参数信息
@@ -434,8 +434,8 @@ if __name__ == "__main__":
     # fk = ForwardKinematics(modol_name)
 
     inputXYZAndRxRyRz = inputFR5LastBase
-    inv.logger.info(
-        "逆向运动学: 已知末端执行器相对于基坐标系的位置和姿态,求对应的六个关节角度. [入参的坐标单位: mm ; 姿态单位: °]")
+    # inv.logger.info(
+    #     "逆向运动学: 已知末端执行器相对于基坐标系的位置和姿态,求对应的六个关节角度. [入参的坐标单位: mm ; 姿态单位: °]")
 
     # inv.logger.info(", ".join(map(str, inputXYZAndRxRyRz)))
 
@@ -449,21 +449,21 @@ if __name__ == "__main__":
     endYOffset = 0.0  # 单位mm
     endZOffset = 0.0  # 单位mm
 
-    inverseKinematics = InverseKinematics.robot_arm_inverse_base_end_position_calculator(inv.logger, unit_type,
+    inverseKinematics = InverseKinematics.robot_arm_inverse_base_end_position_calculator(None, unit_type,
                                                                                          inputXYZAndRxRyRz,
                                                                                          baseXOffset, baseYOffset,
                                                                                          baseZOffset,
                                                                                          endXOffset, endYOffset,
                                                                                          endZOffset)
     optimalSolution = []
-    if not inverseKinematics:
-        inv.logger.info("逆解运算之后无解")
-    else:
+    # if not inverseKinematics:
+        # inv.logger.info("逆解运算之后无解")
+    if inverseKinematics:
         # if const.WEBOTS_ROBOT_ARM_FR5 == modol_name:
         # inverseKinematics = inv.limit_principle(inv.logger, inverseKinematics, 'l')
         # if not inverseKinematics:
         #     print("限位无解")
         lastJointsDegrees = [-90.102, -98.594, -152.756, 71.35, 89.792, -0.672]
         # optimalSolution = InverseKinematics.shortestPathPrinciple(inverseKinematics, lastJointsDegrees)
-        optimalSolution = InverseKinematics.minimumRotationAngle(inv.logger, inverseKinematics, lastJointsDegrees)
+        optimalSolution = InverseKinematics.minimumRotationAngle(None, inverseKinematics, lastJointsDegrees)
         print(optimalSolution)
