@@ -145,3 +145,6 @@ ckpts/
 *.png
 *.npy
 play.ipynb
+
+.idea/
+training/
