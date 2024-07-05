@@ -167,7 +167,7 @@ def main(args):
     elif is_run:
         ckpt_names = [f'policy_last.ckpt']
         for ckpt_name in ckpt_names:
-            eval_bc(config, ckpt_name, is_run, save_episode=True, num_rollouts=1)
+            run_policy(config, ckpt_name)
         exit()
 
 
@@ -286,7 +286,7 @@ def run_policy(config, ckpt_name):
     ### set task
     if 'sim_transfer_cube' in task_name:
         BOX_POSE[0] = sample_box_pose()  # used in sim reset
-    elif 'sim_place_cube' in task_name:
+    elif 'sim_place_cube' in task_name or 'sim_fr5_place_cube' in task_name:
         BOX_POSE[0] = sample_place_box_pose() # used in sim reset
     elif 'sim_insertion' in task_name:
         BOX_POSE[0] = np.concatenate(sample_insertion_pose())  # used in sim reset
