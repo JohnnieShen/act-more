@@ -369,8 +369,9 @@ def run_policy(config, ckpt_name):
 
             ### step the environment
             left_qpos = target_qpos[:6]
-            left_qpos = un
+            left_qpos = unnormalize_angles(left_qpos)
             right_qpos = target_qpos[7:13]
+            right_qpos = unnormalize_angles(right_qpos)
             time5 = time.time()
             if real_robot:
                 ts = env.step(target_qpos, base_action)
