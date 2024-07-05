@@ -20,6 +20,8 @@ from utils import compute_dict_mean, set_seed, detach_dict, calibrate_linear_vel
 from policy import ACTPolicy, CNNMLPPolicy, DiffusionPolicy
 from visualize_episodes import save_videos
 
+from fairino_utils import unnormalize_angles
+
 from detr.models.latent_model import Latent_Model_Transformer
 
 from sim_env import BOX_POSE
@@ -367,6 +369,7 @@ def run_policy(config, ckpt_name):
 
             ### step the environment
             left_qpos = target_qpos[:6]
+            left_qpos = un
             right_qpos = target_qpos[7:13]
             time5 = time.time()
             if real_robot:
