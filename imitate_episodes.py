@@ -232,6 +232,10 @@ def get_image(ts, camera_names, rand_crop_resize=False):
     return curr_image
 
 def run_policy(config, ckpt_name):
+    from fairino import Robot
+
+    robot = Robot.RPC('192.168.31.202')
+
     set_seed(1000)
     ckpt_dir = config['ckpt_dir']
     state_dim = config['state_dim']
@@ -362,10 +366,19 @@ def run_policy(config, ckpt_name):
             base_action = action[-2:]
 
             ### step the environment
+            left_qpos = target_qpos[:6]
+            right_qpos = target_qpos[7:13]
             time5 = time.time()
             if real_robot:
                 ts = env.step(target_qpos, base_action)
             else:
+                t0=time.time()
+                ret = robot.GetForwardKin(left_qpos)
+                print("forward kinematics left: ", ret)
+                ret = robot.GetForwardKin(right_qpos)
+                print("forward kinematics right: ", ret)
+                t1=time.time()
+                print("time spent calculating FK: ", t1-t0)
                 ts = env.step(target_qpos)
             print(f"Step {t}: Target qpos = {target_qpos}")
 
